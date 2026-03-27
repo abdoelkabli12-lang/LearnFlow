@@ -15,6 +15,8 @@
             <h2>Quick links</h2>
             <div class="actions">
                 <a class="button" href="{{ route('admin.users.index') }}">Manage users</a>
+                <a class="button secondary" href="{{ route('host.courses.index') }}">Manage courses</a>
+                <a class="button secondary" href="{{ route('courses.index') }}">Browse courses</a>
                 <a class="button secondary" href="{{ route('profile.show') }}">Profile</a>
             </div>
         </section>

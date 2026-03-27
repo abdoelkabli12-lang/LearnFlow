@@ -15,6 +15,7 @@
             <h2>Next checks</h2>
             <p>This is the right place to plug in enrolled courses, progress, and recent activity later.</p>
             <div class="actions">
+                <a class="button" href="{{ route('courses.index') }}">Browse courses</a>
                 <a class="button secondary" href="{{ route('profile.show') }}">Profile</a>
                 <a class="button secondary" href="{{ route('password.show') }}">Change password</a>
             </div>

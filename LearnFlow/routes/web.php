@@ -5,6 +5,9 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LessonController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\PaymentController;
 
 Route::view('/', 'welcome')->name('home');
 
@@ -83,3 +86,35 @@ Route::middleware(['auth', 'role:host,admin'])
         Route::patch('/{module}', [ModuleController::class, 'update'])->name('update');
         Route::delete('/{module}', [ModuleController::class, 'destroy'])->name('destroy');
     });
+
+
+Route::middleware(['auth', 'role:host'])->prefix('host')->name('host.')->group(function () {
+
+
+    // Modules
+    Route::post('/courses/{course}/modules', [ModuleController::class, 'store'])->name('modules.store');
+    Route::put('/modules/{module}', [ModuleController::class, 'update'])->name('modules.update');
+    Route::delete('/modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
+    Route::post('/courses/{course}/modules/reorder', [ModuleController::class, 'reorder'])->name('modules.reorder');
+
+    // Lessons
+    Route::post('/modules/{module}/lessons', [LessonController::class, 'store'])->name('lessons.store');
+    Route::put('/lessons/{lesson}', [LessonController::class, 'update'])->name('lessons.update');
+    Route::delete('/lessons/{lesson}', [LessonController::class, 'destroy'])->name('lessons.destroy');
+    Route::post('/modules/{module}/lessons/reorder', [LessonController::class, 'reorder'])->name('lessons.reorder');
+});
+
+// Lesson show is outside the host group — accessible by enrolled abonnés too
+Route::middleware('auth')->get('/lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
+
+
+Route::middleware(['auth', 'role:abonne'])->group(function () {
+    Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::get('/enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollments.show');
+    Route::patch('/enrollments/{enrollment}/cancel', [EnrollmentController::class, 'cancel'])->name('enrollments.cancel');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/courses/{course}/checkout', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/courses/{course}/checkout', [PaymentController::class, 'store'])->name('payment.store');
+});

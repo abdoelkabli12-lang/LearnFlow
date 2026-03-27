@@ -62,7 +62,7 @@ class Course extends Model
 
     public function enrollments(): HasMany
     {
-        return $this->hasMany(Enrollement::class);
+        return $this->hasMany(Enrollment::class);
     }
 
     public function reviews(): HasMany

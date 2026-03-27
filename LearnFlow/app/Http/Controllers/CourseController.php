@@ -11,7 +11,9 @@ class CourseController extends Controller
 {
     public function hostIndex()
     {
-        $query = Course::with(['category', 'user'])->latest();
+        $query = Course::with(['category', 'user'])
+            ->withCount(['modules', 'lessons'])
+            ->latest();
 
         if (Auth::user()->role !== 'admin') {
             $query->where('user_id', Auth::id());
@@ -54,6 +56,10 @@ class CourseController extends Controller
 
         $averageRating = $course->reviews->avg('rating');
         $totalStudents = $course->enrollments()->count();
+
+        if (request()->routeIs('host.courses.show')) {
+            return view('host.courses.show', compact('course', 'averageRating', 'totalStudents'));
+        }
 
         return view('courses.show', compact('course', 'averageRating', 'totalStudents'));
     }
