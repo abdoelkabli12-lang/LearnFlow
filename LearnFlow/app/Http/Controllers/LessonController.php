@@ -32,21 +32,17 @@ class LessonController extends Controller
      */
     public function store(StoreLessonRequest $request, Module $module)
     {
-        if (! $module->course->isOwnedBy(Auth::user())){
-            abort(403);
-        }
-
-                $request->validated();
+        $validated = $request->validated();
 
         $order = $module->lessons->max('order_number') + 1;
 
         $content = $this->resolveContent($request);
 
-                $module->lessons()->create([
-            'title'        => $request->title,
-            'type'         => $request->type,
+        $module->lessons()->create([
+            'title'        => $validated['title'],
+            'type'         => $validated['type'],
             'content'      => $content,
-            'duration'     => $request->duration,
+            'duration'     => $validated['duration'] ?? null,
             'is_free'      => $request->boolean('is_free'),
             'order_number' => $order,
         ]);
@@ -59,21 +55,11 @@ class LessonController extends Controller
      */
     public function show(Lesson $lesson)
     {
+        $lesson->load('module.course');
+        $this->authorize('view', $lesson);
+
         $course = $lesson->module->course;
 
-                if (! $lesson->is_free) {
-            if (! Auth::check()) {
-                return redirect()->route('login');
-            }
-            
-            $isEnrolled = $course->enrollments()->where('user_id', Auth::id())->exists();
-
-            if (! $isEnrolled && ! $course->isOwnedBy(Auth::user()) && Auth::user()->role !== 'admin') {
-                abort(403, 'You must be enrolled to access this lesson.');
-            }
-        }
-                
-        $lesson->load('module.course');
         return view('lessons.show', compact('lesson', 'course'));
     }
 
@@ -90,21 +76,9 @@ class LessonController extends Controller
      */
     public function update(UpdateLessonRequest $request, Lesson $lesson)
     {
-                if (! $lesson->module->course->isOwnedBy(Auth::user())) {
-            abort(403);
-        }
- 
-        $request->validate([
-            'title'        => ['required', 'string', 'max:255'],
-            'type'         => ['required', 'in:video,document,text'],
-            'duration'     => ['nullable', 'integer', 'min:1'],
-            'is_free'      => ['boolean'],
-            'content_url'  => ['required_if:type,video', 'nullable', 'url'],
-            'content_file' => ['required_if:type,document', 'nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
-            'content_text' => ['required_if:type,text', 'nullable', 'string'],
-        ]);
- 
-        $data = $request->only('title', 'type', 'duration');
+        $this->authorize('update', $lesson);
+
+        $data = $request->validated();
         $data['is_free'] = $request->boolean('is_free');
  
         $content = $this->resolveContent($request);
@@ -122,9 +96,7 @@ class LessonController extends Controller
      */
     public function destroy(Lesson $lesson)
     {
-        if (! $lesson->module->course->isOwnedBy(Auth::user())) {
-            abort(403);
-        }
+        $this->authorize('delete', $lesson);
  
         $lesson->delete();
  
@@ -132,7 +104,7 @@ class LessonController extends Controller
     }
 
     public function reorder(Request $request, Module $module) {
-                if (! $module->course->isOwnedBy(Auth::user())) {
+        if (! Auth::user()->can('update', $module->course)) {
             abort(403);
         }
  
@@ -141,6 +113,15 @@ class LessonController extends Controller
             'order.*' => ['integer', 'exists:lessons,id'],
         ]);
  
+        $lessonIds = $module->lessons()->pluck('id')->map(fn ($id) => (int) $id)->sort()->values();
+        $requestedIds = collect($request->order)->map(fn ($id) => (int) $id)->sort()->values();
+
+        if ($lessonIds->count() !== $requestedIds->count() || $lessonIds->all() !== $requestedIds->all()) {
+            return response()->json([
+                'message' => 'The provided order must contain every lesson in this module exactly once.',
+            ], 422);
+        }
+
         foreach ($request->order as $position => $lessonId) {
             $module->lessons()->where('id', $lessonId)->update([
                 'order_number' => $position + 1,

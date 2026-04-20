@@ -4,8 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-use function Symfony\Component\Clock\now;
-
 return new class extends Migration
 {
     /**
@@ -15,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->float('amount');
+            $table->decimal('amount', 8, 2);
             $table->enum('status', ['cancelled', 'pending', 'accepted']);
-            $table->timestamp('payment_date')->default(now());
+            $table->timestamp('payment_date')->useCurrent();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('course_id')->constrained()->onDelete('cascade');
             $table->foreignId('enrollment_id')->constrained('enrollments')->onDelete('cascade');

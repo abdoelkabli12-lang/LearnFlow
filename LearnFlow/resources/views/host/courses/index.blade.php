@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Manage Courses')
-@section('lead', 'A simple but nicer control room for browsing your courses and jumping into the module and lesson workspace.')
+@section('lead', 'Browse your courses and jump into the module and lesson workspace.')
 
 @section('content')
     <section class="card">
@@ -61,7 +61,7 @@
                 </div>
             @endif
         @else
-            <p style="margin-top: 1rem;">No courses yet. Create your first one to test the full flow.</p>
+            <p style="margin-top: 1rem;">No courses yet. Create your first one to start building the catalog.</p>
         @endif
     </section>
 @endsection

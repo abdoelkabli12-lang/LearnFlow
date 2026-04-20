@@ -1,13 +1,13 @@
 @extends('layouts.test-page')
 
 @section('title', 'Host Dashboard')
-@section('lead', 'Minimal dashboard page used when the controller returns the host dashboard view.')
+@section('lead', 'Manage course creation, publishing, and learner-facing content from one workspace.')
 
 @section('content')
     <div class="grid">
         <section class="card">
             <h2>Host dashboard</h2>
-            <p>You reached the host dashboard view.</p>
+            <p>Your host workspace is ready.</p>
             <p class="meta">User: {{ $user->name }} ({{ $user->email }})</p>
         </section>
 

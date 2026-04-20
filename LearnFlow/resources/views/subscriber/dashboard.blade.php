@@ -1,13 +1,13 @@
 @extends('layouts.test-page')
 
 @section('title', 'Subscriber Dashboard')
-@section('lead', 'Minimal dashboard page used when the controller returns the subscriber dashboard view.')
+@section('lead', 'Browse premium learning paths and keep your account details ready for enrollment.')
 
 @section('content')
     <div class="grid">
         <section class="card">
             <h2>Subscriber dashboard</h2>
-            <p>You reached the subscriber dashboard view.</p>
+            <p>Your subscriber workspace is ready.</p>
             <p class="meta">User: {{ $user->name }} ({{ $user->email }})</p>
         </section>
 

@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Create Course')
-@section('lead', 'Minimal form for testing course creation as a host or admin.')
+@section('lead', 'Draft a polished course with the details learners need before they commit.')
 
 @section('content')
     <section class="card">

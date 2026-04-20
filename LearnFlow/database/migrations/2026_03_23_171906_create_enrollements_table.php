@@ -18,7 +18,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('progress')->default(0);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('course_id')->constrained()->onDelete('cascade');
-            $table->foreignId('payment_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

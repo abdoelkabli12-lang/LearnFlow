@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Course;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,10 @@ class StoreModuleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $course = $this->route('course');
+
+        return $course instanceof Course
+            && (bool) $this->user()?->can('update', $course);
     }
 
     /**
@@ -23,8 +27,8 @@ class StoreModuleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'        => 'required|string|max:255',
-            'duration'     => 'nullable|integer|min:1',
+            'title' => ['required', 'string', 'max:255'],
+            'duration' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

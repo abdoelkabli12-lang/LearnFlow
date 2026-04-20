@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
-@section('title', 'Admin Users Index')
-@section('lead', 'Simple user list for checking that the admin index route resolves and passes paginated user data into the view.')
+@section('title', 'Admin Users')
+@section('lead', 'Review learner, host, and admin accounts across the platform.')
 
 @section('content')
     <section class="card">
@@ -37,7 +37,7 @@
                 </tbody>
             </table>
         @else
-            <p>No users were returned for this test.</p>
+            <p>No users are available yet.</p>
         @endif
     </section>
 @endsection

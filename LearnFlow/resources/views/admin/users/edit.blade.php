@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
-@section('title', 'Admin User Edit')
-@section('lead', 'Minimal edit form for testing the admin user edit, update, and delete routes.')
+@section('title', 'Edit User')
+@section('lead', 'Adjust user roles and keep account access aligned with each person’s responsibilities.')
 
 @section('content')
     <div class="grid">
@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="actions">
-                    <button type="submit">Test PATCH /admin/users/{{ $user->id }}</button>
+                    <button type="submit">Save role</button>
                     <a class="button secondary" href="{{ route('admin.users.show', $user) }}">Cancel</a>
                 </div>
             </form>
@@ -33,7 +33,7 @@
             <form method="POST" action="{{ route('admin.users.destroy', $user) }}">
                 @csrf
                 @method('DELETE')
-                <button class="danger" type="submit">Test DELETE /admin/users/{{ $user->id }}</button>
+                <button class="danger" type="submit">Delete user</button>
             </form>
         </section>
     </div>

@@ -12,7 +12,7 @@ class StorePaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return (bool) $this->user();
     }
 
     /**
@@ -23,7 +23,12 @@ class StorePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            'user_id' => ['prohibited'],
+            'course_id' => ['prohibited'],
+            'enrollment_id' => ['prohibited'],
+            'amount' => ['prohibited'],
+            'status' => ['prohibited'],
+            'payment_date' => ['prohibited'],
         ];
     }
 }

@@ -4,21 +4,34 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Enrollment extends Model
 {
-    /** @use HasFactory<\Database\Factories\EnrollementFactory> */
+    /** @use HasFactory<\Database\Factories\EnrollmentFactory> */
     use HasFactory;
 
     protected $table = 'enrollments';
 
     protected $fillable = ['enrolled_at', 'status', 'progress', 'user_id', 'course_id'];
 
-    public function user() {
-    return $this->belongsTo(User::class);
-}
+    protected $casts = [
+        'enrolled_at' => 'date',
+    ];
 
-public function course() {
-    return $this->belongsTo(Course::class);
-}
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

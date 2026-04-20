@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Review;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,10 @@ class UpdateReviewRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $review = $this->route('review');
+
+        return $review instanceof Review
+            && (bool) $this->user()?->can('update', $review);
     }
 
     /**
@@ -23,7 +27,8 @@ class UpdateReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'rating' => ['sometimes', 'required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['sometimes', 'required', 'string', 'max:2500'],
         ];
     }
 }

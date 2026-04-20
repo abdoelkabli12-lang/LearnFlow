@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Course;
+use App\Models\Module;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +14,14 @@ class UpdateModuleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $course = $this->route('course');
+        $module = $this->route('module');
+
+        if (! $module instanceof Module || ! $course instanceof Course || $module->course_id !== $course->id) {
+            return false;
+        }
+
+        return (bool) $this->user()?->can('update', $module);
     }
 
     /**
@@ -23,8 +32,8 @@ class UpdateModuleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'        => 'required|string|max:255',
-            'duration'     => 'nullable|integer|min:1',
+            'title' => ['required', 'string', 'max:255'],
+            'duration' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

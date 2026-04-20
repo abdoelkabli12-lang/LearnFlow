@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'role'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'role', 'bio', 'avatar'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -19,7 +19,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
 
-    protected $fillable = ['name', 'email', 'phone', 'password', 'role'];
+    protected $fillable = ['name', 'email', 'phone', 'password', 'role', 'bio', 'avatar'];
     protected $hidden = ['password', 'remember_token'];
     
     protected function casts(): array
@@ -44,6 +44,8 @@ class User extends Authenticatable
     }
 
     public function enrolledCourses() {
-        return $this->belongsToMany(Course::class, 'enrollments')->withPivot('progress', 'completed_at')->withTimestamps();
+        return $this->belongsToMany(Course::class, 'enrollments')
+            ->withPivot('progress', 'status', 'enrolled_at')
+            ->withTimestamps();
     }
 }

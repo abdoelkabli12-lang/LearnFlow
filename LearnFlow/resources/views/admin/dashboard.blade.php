@@ -1,13 +1,13 @@
 @extends('layouts.test-page')
 
 @section('title', 'Admin Dashboard')
-@section('lead', 'Minimal admin dashboard returned by the role-aware dashboard action.')
+@section('lead', 'Oversee users, categories, and course operations across the LearnFlow platform.')
 
 @section('content')
     <div class="grid">
         <section class="card">
             <h2>Admin dashboard</h2>
-            <p>You reached the admin dashboard view.</p>
+            <p>Your admin workspace is ready.</p>
             <p class="meta">User: {{ $user->name }} ({{ $user->email }})</p>
         </section>
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Category;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -11,6 +13,8 @@ class CourseController extends Controller
 {
     public function hostIndex()
     {
+        $this->authorize('viewAny', Course::class);
+
         $query = Course::with(['category', 'user'])
             ->withCount(['modules', 'lessons'])
             ->latest();
@@ -55,7 +59,7 @@ class CourseController extends Controller
         $course->load(['category', 'user', 'modules.lessons', 'reviews.user']);
 
         $averageRating = $course->reviews->avg('rating');
-        $totalStudents = $course->enrollments()->count();
+        $totalStudents = $course->enrollments()->where('status', 'accepted')->count();
 
         if (request()->routeIs('host.courses.show')) {
             return view('host.courses.show', compact('course', 'averageRating', 'totalStudents'));
@@ -66,23 +70,16 @@ class CourseController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Course::class);
+
         $categories = Category::orderBy('name')->get();
 
         return view('host.courses.create', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request)
     {
-        $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'required|string',
-            'price'       => 'required|numeric|min:0',
-            'level'       => 'required|in:Beginner,Intermediate,Advanced,All',
-            'category_id' => 'required|exists:categories,id',
-            'thumbnail'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
-
-        $data = $request->only('title', 'description', 'price', 'level', 'category_id');
+        $data = $request->validated();
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('thumbnail')) {
@@ -94,22 +91,11 @@ class CourseController extends Controller
         return redirect()->route('host.courses.show', $course)->with('success', 'Course created successfully.');
     }
 
-    public function update(Request $request, Course $course)
+    public function update(UpdateCourseRequest $request, Course $course)
     {
-        if (! $this->canManage($course)) {
-            abort(403);
-        }
+        $this->authorize('update', $course);
 
-        $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'required|string',
-            'price'       => 'required|numeric|min:0',
-            'level'       => 'required|in:Beginner,Intermediate,Advanced,All',
-            'category_id' => 'required|exists:categories,id',
-            'thumbnail'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
-
-        $data = $request->only('title', 'description', 'price', 'level', 'category_id');
+        $data = $request->validated();
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
@@ -122,9 +108,7 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
-        if (! $this->canManage($course)) {
-            abort(403);
-        }
+        $this->authorize('update', $course);
 
         $categories = Category::orderBy('name')->get();
 
@@ -133,9 +117,7 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
-        if (! $this->canManage($course)) {
-            abort(403);
-        }
+        $this->authorize('delete', $course);
 
         $course->delete();
 
@@ -144,9 +126,7 @@ class CourseController extends Controller
 
     public function togglePublish(Course $course)
     {
-        if (! $this->canManage($course)) {
-            abort(403);
-        }
+        $this->authorize('publish', $course);
 
         $course->update(['is_published' => ! $course->is_published]);
 
@@ -157,19 +137,11 @@ class CourseController extends Controller
 
     private function canManage(Course $course): bool
     {
-        $user = Auth::user();
-
-        return (bool) $user && ($user->role === 'admin' || $course->isOwnedBy($user));
+        return (bool) auth()->user()?->can('update', $course);
     }
 
     private function canPreview(Course $course): bool
     {
-        $user = auth()->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $this->canManage($course);
+        return (bool) auth()->user()?->can('view', $course);
     }
 }

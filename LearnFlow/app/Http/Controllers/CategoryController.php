@@ -13,6 +13,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Category::class);
+
         $categories = Category::withCount('courses')->latest()->get();
 
         return view('admin.categories.index', compact('categories'));
@@ -31,9 +33,7 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        $validated = $request->validated();
-
-        Category::create($validated);
+        Category::create($request->validated());
 
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully');
     }
@@ -59,6 +59,8 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
+        $this->authorize('update', $category);
+
         $validated = $request->validated();
         $validated['slug'] = str($validated['name'])->slug();
 
@@ -72,6 +74,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        $this->authorize('delete', $category);
+
         if ($category->courses()->exists()) {
             return redirect()->route('admin.categories.index')->withErrors(['error' => 'Cannot delete a category that has courses. Reassign them first.']);
         }

@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Manage Categories')
-@section('lead', 'Minimal category management page so category routes work and course creation has a clean place to manage options.')
+@section('lead', 'Organize the catalog with clear categories that make course discovery feel effortless.')
 
 @section('content')
     <div class="grid">

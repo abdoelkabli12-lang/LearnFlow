@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', $course->title)
-@section('lead', 'Host workspace for testing course, module, lesson, publish, and access flows without leaving the page.')
+@section('lead', 'Build curriculum, arrange lessons, and manage publishing from a focused host workspace.')
 
 @section('content')
     @php
@@ -71,10 +71,10 @@
                     <span class="eyebrow">Quick actions</span>
                     <h2>Create a module</h2>
                 </div>
-                <span class="pill">POST {{ route('host.modules.store', $course) }}</span>
+                <span class="pill">POST {{ route('host.courses.modules.store', $course) }}</span>
             </div>
 
-            <form class="stack" method="POST" action="{{ route('host.modules.store', $course) }}" style="margin-top: 1rem;">
+            <form class="stack" method="POST" action="{{ route('host.courses.modules.store', $course) }}" style="margin-top: 1rem;">
                 @csrf
 
                 <div class="field">
@@ -192,7 +192,7 @@
                                 <div class="split">
                                     <div>
                                         <span class="eyebrow">Add lesson</span>
-                                        <p class="meta">Use this form to test lesson creation for the selected module.</p>
+                                        <p class="meta">Create the next lesson for the selected module.</p>
                                     </div>
                                     <span class="pill">Module {{ $module->id }}</span>
                                 </div>

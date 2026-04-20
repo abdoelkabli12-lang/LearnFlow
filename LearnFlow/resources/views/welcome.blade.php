@@ -70,38 +70,7 @@
             ],
         ];
 
-        $courses = $courses ?? [
-            [
-                'title' => 'Editorial UI Systems',
-                'category' => 'Design',
-                'rating' => '4.9',
-                'price' => '$199',
-                'description' => 'Master the art of high-end digital layouts using editorial principles and grid systems.',
-                'instructor' => 'Prof. Julian Vane',
-                'image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcjK5svWy6V7UPwVpEWcji78mNC3O7oXhT9Y3dLM10mm7TajO1G5Vlxtya5GIAlPOczzubscPzk0XkaBRoMtqWCxJq6-61Ghnnf6GxwkkZzyJCF38LTboa4GRF4TqbfaQ9m6wyaPOXRantXwTSiZzCGmUL6Htz7R7ySVVSFmf0BdTzhdlU750YXUB7R99wlInZoPpiIIyGtXJJ7mnb9F2Hz_3pBTUJq04PaJ3wCAd9AzLlsU052lc3Sh2BCIrfShEOmtxihmCrjFU',
-                'instructor_image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuDXRw56L2wt0SmsPuEa1nRhYbr3tskvtAauun4awnfqM81_cHAekeBGaAqaCyp9Q6kjRo9UdF4NIZ8GYMMF-V4lYnJupvUQOyP83Th7x6Euhg96QF8cAkjYQ7hXUjrpfDkgptSGhX1HoLujMgLZGHbd-lhi80geSRtixjtZyps5Be0hFehahzfL1KSH-0pPDLR15Ad8ydLFvf5ppf3Lwd_MV7tCgw87tIDYBiPtSguFcv_c_J3uoyK6cr2y9WUskJO3Tn9BwGGbejA',
-            ],
-            [
-                'title' => 'Full-Stack Intelligence',
-                'category' => 'Development',
-                'rating' => '4.8',
-                'price' => '$249',
-                'description' => 'Building modern web applications with a focus on architecture and scalable performance.',
-                'instructor' => 'Sarah Sterling',
-                'image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuALqc_gjWrNvvsziCeN7VfGkM290hlWWtmd8c7EWdYlZ16OFEM7zigE5Hq8U2vtukZBgiEq7zAU8ZcPT9BfHexaNzAGBxJlPK68hpgpJ-vB-5Qccb9N9yEdO69RQifygzQ5iPCQ4O6fRV0OxDVOosGT815rSr2Dl4Zzaoo6CDXFyVEgKlVJ7_iB6oSiSlgBMlaY9Fi6FXQ2WJi5AJL5JQ2TL6m2_AWfqLGYpXGXRtnBwxkkTG3CsZwiaD-fLXRAhCcz2R00ThLNCcY',
-                'instructor_image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCIhkH61BTWEzKErG1uTrs_OhEduVioMPP0x1IpIh-sAY2YqoAVmuN-xQR25cVBheH0dobOFcIOwNowqKcc0v6q8lKuUN9hnodkqhorVGxxDen2V9uft7Wzr8R0kzNoMC-wrDsGfoVfOwGDn-mYCEsrDxdfsdym8-41Jj6xr7vZ_-q3oX7tL_xgPtBOsdacORQM3nGJW3B0bzKgb2Kmt4EVuSO8DtHawaU2q9Tr_kjAqR4obXzTb5AkfDH3tmnAjw6457Y0UgqH1mE',
-            ],
-            [
-                'title' => 'Digital Strategy Lab',
-                'category' => 'Business',
-                'rating' => '5.0',
-                'price' => '$175',
-                'description' => 'Transforming traditional business models into digital-first powerhouses through analytics.',
-                'instructor' => 'Marc Hudson',
-                'image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuBVkqZhwHo_OOLT3R48YPf4LhpFzbUaE1UuRFDHVU9Vxo_kAiFSCkciymRAoCf3owTQyW3kEMD5jiJJkKiDWgFreMAWf0aSA6Au_SXy7Ca2g9G6MDQbCHERmD5cOwxpgBDE8nRVfuKgyEQkmvlB7-nfr4r3Ats8bicIHpq4ry22PYdqkJsUYW4Zg-97dzlyrm-gTVf8-EYAvsJ6ZsJyaDm3wQQMzcsycFVh-OcFSNA2qWmrNwq33Vwn4qlIXrLK1a3cGsaHvfWQknw',
-                'instructor_image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuCaSSNmqxnztsUZoqDCAPIlbUh7V7DS4Ff1XEjrbKXBvjpjEuhdNcKN0ZXRTweLZ6hSIpONBQcjI35UY7r8EudGdyi-2ALkSbRL2u8Y7cBZ1QPsxwGQbVGUn7660qx9-6UtP7Fcp-Y6nNpOkqtMXEB9ALp0gFb6Og3YH3_z-8OdUMEfQR-gH461pSFzjqBAqzQUhwZc92J-hjU72eqIkVBKe1RlmFD2vh2BjSAtcD8FRFMWixFVqmuwbDabqUYuFbK1lIW5UWAQMig',
-            ],
-        ];
+        $courses = $courses ?? collect();
 
         $miniTestimonials = [
             ['text' => 'The structured approach to learning complex development concepts is unparalleled.', 'name' => 'Liam T.'],
@@ -259,8 +228,8 @@
             <div class="mx-auto max-w-7xl">
                 <div class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                     <div>
-                        <h2 class="mb-4 font-['Manrope'] text-4xl font-extrabold tracking-tight text-indigo-950">Trending Curriculums</h2>
-                        <p class="text-slate-600">Most enrolled programs this season.</p>
+                        <h2 class="mb-4 font-['Manrope'] text-4xl font-extrabold tracking-tight text-indigo-950">Featured Courses</h2>
+                        <p class="text-slate-600">The first published courses available on LearnFlow.</p>
                     </div>
                     <a href="{{ route('courses.index') }}" class="flex items-center gap-2 font-semibold text-indigo-600 transition-all hover:gap-4">
                         View All Courses
@@ -269,47 +238,74 @@
                 </div>
 
                 <div class="grid gap-8 md:grid-cols-3">
-                    @foreach ($courses as $course)
+                    @forelse ($courses as $course)
+                        @php
+                            $rating = $course->reviews->avg('rating');
+                            $thumbnailUrl = $course->thumbnail ? asset('storage/' . $course->thumbnail) : null;
+                            $instructorAvatarUrl = $course->user?->avatar ? asset('storage/' . $course->user->avatar) : null;
+                            $instructorName = $course->user?->name ?? 'Unknown Instructor';
+                            $categoryName = $course->category?->name ?? 'Uncategorized';
+                            $description = \Illuminate\Support\Str::limit($course->description ?? 'Course description coming soon.', 120);
+                        @endphp
                         <div class="group overflow-hidden rounded-2xl bg-white transition-all hover:-translate-y-2 hover:shadow-2xl">
                             <div class="relative aspect-video overflow-hidden">
-                                <img src="{{ $course['image'] }}" alt="{{ $course['title'] }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                @if ($thumbnailUrl)
+                                    <img src="{{ $thumbnailUrl }}" alt="{{ $course->title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                @else
+                                    <div class="flex h-full w-full items-end bg-gradient-to-br from-indigo-950 via-indigo-700 to-emerald-500 p-6">
+                                        <span class="font-['Manrope'] text-2xl font-extrabold leading-tight text-white">
+                                            {{ $course->title }}
+                                        </span>
+                                    </div>
+                                @endif
                                 <div class="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-950">
-                                    {{ $course['category'] }}
+                                    {{ $categoryName }}
                                 </div>
                             </div>
 
                             <div class="space-y-4 p-8">
                                 <div class="flex items-start justify-between gap-4">
                                     <h3 class="font-['Manrope'] text-xl font-bold text-indigo-950 transition-colors group-hover:text-indigo-600">
-                                        {{ $course['title'] }}
+                                        {{ $course->title }}
                                     </h3>
                                     <div class="flex items-center gap-1 text-sm font-bold text-emerald-700">
                                         <span class="material-symbols-outlined text-sm">star</span>
-                                        {{ $course['rating'] }}
+                                        {{ $rating ? number_format((float) $rating, 1) : 'New' }}
                                     </div>
                                 </div>
 
-                                <p class="line-clamp-2 text-sm text-slate-600">{{ $course['description'] }}</p>
+                                <p class="line-clamp-2 text-sm text-slate-600">{{ $description }}</p>
 
                                 <div class="flex items-center gap-3 border-t border-slate-200 pt-4">
-                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ $course['instructor_image'] }}" alt="{{ $course['instructor'] }}">
-                                    <span class="text-xs font-medium text-slate-600">{{ $course['instructor'] }}</span>
+                                    @if ($instructorAvatarUrl)
+                                        <img class="h-8 w-8 rounded-full object-cover" src="{{ $instructorAvatarUrl }}" alt="{{ $instructorName }}">
+                                    @else
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+                                            {{ \Illuminate\Support\Str::of($instructorName)->trim()->substr(0, 1)->upper() }}
+                                        </div>
+                                    @endif
+                                    <span class="text-xs font-medium text-slate-600">{{ $instructorName }}</span>
                                 </div>
 
                                 <div class="flex items-center justify-between pt-2">
-                                    <span class="font-['Manrope'] text-2xl font-extrabold text-indigo-950">{{ $course['price'] }}</span>
-                                    <a href="{{ route('courses.index') }}" class="rounded-full p-2 text-indigo-600 transition-colors hover:bg-slate-100">
+                                    <span class="font-['Manrope'] text-2xl font-extrabold text-indigo-950">${{ number_format((float) $course->price, 2) }}</span>
+                                    <a href="{{ route('courses.show', $course) }}" class="rounded-full p-2 text-indigo-600 transition-colors hover:bg-slate-100">
                                         <span class="material-symbols-outlined">bookmark_add</span>
                                     </a>
                                 </div>
 
-                                <a href="{{ route('courses.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition-all hover:gap-3">
-                                    Open course catalog
+                                <a href="{{ route('courses.show', $course) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition-all hover:gap-3">
+                                    View course
                                     <span class="material-symbols-outlined text-base">arrow_forward</span>
                                 </a>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-10 text-center text-slate-600 md:col-span-3">
+                            <h3 class="font-['Manrope'] text-2xl font-bold text-indigo-950">No published courses yet</h3>
+                            <p class="mt-3">As soon as your first courses are published, they will appear here on the landing page.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </section>

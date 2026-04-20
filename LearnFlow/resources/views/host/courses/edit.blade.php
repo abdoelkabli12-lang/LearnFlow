@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Edit Course')
-@section('lead', 'Minimal form for testing course updates and deletes.')
+@section('lead', 'Refine pricing, positioning, category, and level before your course reaches learners.')
 
 @section('content')
     <div class="grid">

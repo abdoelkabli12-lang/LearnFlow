@@ -41,20 +41,15 @@ class UserController extends Controller
     }
 
 
-    public function register(Request $request)
+    public function register(StoreUserRequest $request)
     {
-        $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone' => 'required|string|max:12',
-            'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'password' => Hash::make($validated['password']),
             'role' => 'visitor',
         ]);
 
@@ -93,6 +88,7 @@ class UserController extends Controller
 public function showProfile()
     {
         $user = Auth::user();
+        $this->authorize('view', $user);
  
         return view('auth.profile', compact('user'));
     }
@@ -100,6 +96,7 @@ public function showProfile()
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
+        $this->authorize('update', $user);
  
         $request->validate([
             'name'   => ['required', 'string', 'max:255'],
@@ -149,6 +146,8 @@ public function showProfile()
  
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
+
         $query = User::query();
  
         if ($search = $request->input('search')) {
@@ -167,23 +166,25 @@ public function showProfile()
  
     public function show(User $user)
     {
+        $this->authorize('view', $user);
+
         return view('admin.users.show', compact('user'));
     }
  
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
+
         $roles = ['visitor', 'student', 'host', 'admin'];
  
         return view('admin.users.edit', compact('user', 'roles'));
     }
  
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $request->validate([
-            'role' => ['required', 'in:visitor,student,host,admin'],
-        ]);
- 
-        $user->update($request->only('role'));
+        $this->authorize('update', $user);
+
+        $user->update($request->validated());
  
         return redirect()->route('admin.users.index')
                          ->with('success', "User {$user->name} has been updated.");
@@ -191,9 +192,7 @@ public function showProfile()
  
     public function destroy(User $user)
     {
-        if ($user->id === Auth::id()) {
-            return back()->withErrors(['error' => 'You cannot delete your own account.']);
-        }
+        $this->authorize('delete', $user);
  
         $user->delete();
  

@@ -2,14 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\Enrollement;
+use App\Models\Enrollment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Enrollement>
+ * @extends Factory<Enrollment>
  */
-class EnrollementFactory extends Factory
+class EnrollmentFactory extends Factory
 {
+    protected $model = Enrollment::class;
+
     /**
      * Define the model's default state.
      *
@@ -18,7 +20,9 @@ class EnrollementFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'enrolled_at' => now(),
+            'status' => 'accepted',
+            'progress' => 0,
         ];
     }
 }

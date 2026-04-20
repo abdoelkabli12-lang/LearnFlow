@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Change Password')
-@section('lead', 'Small password form for testing GET /change-password and POST /change-password.')
+@section('lead', 'Keep your LearnFlow account secure with a fresh password.')
 
 @section('content')
     <div class="grid">
@@ -25,13 +25,13 @@
                     <input id="password_confirmation" type="password" name="password_confirmation" required>
                 </div>
 
-                <button type="submit">Test POST /change-password</button>
+                <button type="submit">Update password</button>
             </form>
         </section>
 
         <section class="card">
-            <h2>Why this exists</h2>
-            <p>This page removes the missing-view blocker so password flow testing can focus on controller behavior.</p>
+            <h2>Account security</h2>
+            <p>Choose a password you do not reuse anywhere else and keep your active learning workspace protected.</p>
         </section>
     </div>
 @endsection

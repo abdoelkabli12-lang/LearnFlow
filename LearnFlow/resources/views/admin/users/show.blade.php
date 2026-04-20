@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
-@section('title', 'Admin User Detail')
-@section('lead', 'Minimal user detail page for the admin show route.')
+@section('title', 'User Detail')
+@section('lead', 'View account details and jump into role management when access needs to change.')
 
 @section('content')
     <div class="grid">

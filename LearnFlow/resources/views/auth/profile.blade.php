@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Profile')
-@section('lead', 'Simple profile page for testing the authenticated profile route and its update form.')
+@section('lead', 'Keep your learner identity current across courses, reviews, and host workspaces.')
 
 @section('content')
     <div class="grid">
@@ -27,7 +27,7 @@
 
                 <div class="field">
                     <label for="bio">Bio</label>
-                    <textarea id="bio" name="bio" placeholder="Short bio for testing">{{ old('bio', $user->bio ?? '') }}</textarea>
+                    <textarea id="bio" name="bio" placeholder="Share a short professional bio">{{ old('bio', $user->bio ?? '') }}</textarea>
                 </div>
 
                 <div class="field">
@@ -35,7 +35,7 @@
                     <input id="avatar" type="file" name="avatar" accept=".jpg,.jpeg,.png,.webp">
                 </div>
 
-                <button type="submit">Test PATCH /profile</button>
+                <button type="submit">Save profile</button>
             </form>
         </section>
 

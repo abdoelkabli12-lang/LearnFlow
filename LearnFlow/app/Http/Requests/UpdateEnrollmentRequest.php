@@ -2,22 +2,22 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Payment;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdatePaymentRequest extends FormRequest
+class UpdateEnrollmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        $payment = $this->route('payment');
+        $enrollment = $this->route('enrollment');
 
-        return $payment instanceof Payment
-            && (bool) $this->user()?->can('update', $payment);
+        return $enrollment
+            ? (bool) $this->user()?->can('update', $enrollment)
+            : (bool) $this->user();
     }
 
     /**
@@ -28,12 +28,11 @@ class UpdatePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['sometimes', 'numeric', 'min:0'],
+            'enrolled_at' => ['sometimes', 'nullable', 'date', 'before_or_equal:today'],
             'status' => ['sometimes', Rule::in(['pending', 'accepted', 'cancelled'])],
-            'payment_date' => ['sometimes', 'date'],
+            'progress' => ['sometimes', 'integer', 'between:0,100'],
             'user_id' => ['prohibited'],
             'course_id' => ['prohibited'],
-            'enrollment_id' => ['prohibited'],
         ];
     }
 }

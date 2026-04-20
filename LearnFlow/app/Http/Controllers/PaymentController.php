@@ -4,14 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePaymentRequest;
 use App\Http\Requests\UpdatePaymentRequest;
-use App\Models\Payment;
-use App\Models\Enrollment;
+use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Course;
-use App\Models\Enrollement;
-
-use function Symfony\Component\Clock\now;
+use App\Models\Enrollment;
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
@@ -36,45 +33,75 @@ class PaymentController extends Controller
      */
     public function store(StorePaymentRequest $request, Course $course)
     {
-                if ($course->enrollments()->where('user_id', Auth::id())->exists()){
-            return redirect()->route('enrollments.show', $course)->withErrors('error', "You're already enrolled in this course!");
+        $this->authorize('create', Payment::class);
+
+        if (! $course->is_published) {
+            abort(404);
         }
 
-        if ($course->isOwnedBy(Auth::user())){
-            return back()->withErrors('error', 'you can not enroll into your own course');
+        $existingEnrollment = $course->enrollments()
+            ->where('user_id', Auth::id())
+            ->where('status', 'accepted')
+            ->latest()
+            ->first();
+
+        if ($existingEnrollment) {
+            return redirect()
+                ->route('enrollments.show', $existingEnrollment)
+                ->withErrors(['error' => "You're already enrolled in this course."]);
         }
 
-        DB::transaction(function () use ($course){
+        if ($course->isOwnedBy(Auth::user())) {
+            return back()->withErrors(['error' => 'You cannot enroll in your own course.']);
+        }
 
-        $payment = Payment::create([
-            'user_id' => Auth::id(),
-            'course_id' => $course->id,
-            'enrollment_id' => Enrollment::id(),
-            'amount' => $course->price,
-            'status' => 'accepted',
-            'payment_date' => now(),
-        ]);
+        $enrollment = DB::transaction(function () use ($course) {
+            $enrollment = Enrollment::create([
+                'user_id' => Auth::id(),
+                'course_id' => $course->id,
+                'enrolled_at' => now(),
+                'status' => 'accepted',
+                'progress' => 0,
+            ]);
 
-        $enrollment = Enrollment::create([
-            'payment_id' => $payment->id,
-            'user_id' => Auth::id(),
-            'course_id' => $course->id,
-            'enrolled_at' => now(),
-            'status' => 'accepted',
-            'progress' => 0
-        ]);
-    });
-    return redirect()->route('enrollments.index')->with('success', 'You have successfuly enrolled in teh course');
+            Payment::create([
+                'user_id' => Auth::id(),
+                'course_id' => $course->id,
+                'enrollment_id' => $enrollment->id,
+                'amount' => $course->price,
+                'status' => 'accepted',
+                'payment_date' => now(),
+            ]);
+
+            return $enrollment;
+        });
+
+        return redirect()
+            ->route('enrollments.show', $enrollment)
+            ->with('success', 'You have successfully enrolled in the course.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Payment $payment, Course $course)
+    public function show(Course $course)
     {
+        $this->authorize('create', Payment::class);
 
-        if ($course->enrollment()->where('user_id', Auth::id())->exists()){
-            return redirect()->route('enrollment.show', $course)->withErrors('error', "You're already enrolled in this course!");
+        if (! $course->is_published) {
+            abort(404);
+        }
+
+        $existingEnrollment = $course->enrollments()
+            ->where('user_id', Auth::id())
+            ->where('status', 'accepted')
+            ->latest()
+            ->first();
+
+        if ($existingEnrollment) {
+            return redirect()
+                ->route('enrollments.show', $existingEnrollment)
+                ->withErrors(['error' => "You're already enrolled in this course."]);
         }
 
         return view('payments.show', compact('course'));

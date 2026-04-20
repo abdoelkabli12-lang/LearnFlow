@@ -1,19 +1,19 @@
 @extends('layouts.test-page')
 
 @section('title', 'Student Dashboard')
-@section('lead', 'Minimal dashboard page used when the controller returns the student dashboard view.')
+@section('lead', 'Return to your active courses, track momentum, and discover what to learn next.')
 
 @section('content')
     <div class="grid">
         <section class="card">
             <h2>Student dashboard</h2>
-            <p>You reached the student dashboard view.</p>
+            <p>Your student workspace is ready.</p>
             <p class="meta">User: {{ $user->name }} ({{ $user->email }})</p>
         </section>
 
         <section class="card">
             <h2>Next checks</h2>
-            <p>This is the right place to plug in enrolled courses, progress, and recent activity later.</p>
+            <p>Explore the catalog, refine your profile, or update account security before your next session.</p>
             <div class="actions">
                 <a class="button" href="{{ route('courses.index') }}">Browse courses</a>
                 <a class="button secondary" href="{{ route('profile.show') }}">Profile</a>

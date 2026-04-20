@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', $lesson->title)
-@section('lead', 'Simple lesson viewer for testing access rules, free previews, and lesson content rendering.')
+@section('lead', 'Focus on the selected lesson and return to the course whenever you are ready.')
 
 @section('content')
     @php
@@ -38,7 +38,7 @@
                 <article class="metric-card">
                     <span class="eyebrow">Lesson ID</span>
                     <strong>{{ $lesson->id }}</strong>
-                    <p class="meta">Useful when you are testing updates and reorder responses.</p>
+                    <p class="meta">Reference for course organization and host updates.</p>
                 </article>
                 <article class="metric-card">
                     <span class="eyebrow">Order</span>

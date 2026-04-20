@@ -1,12 +1,12 @@
 @extends('layouts.test-page')
 
 @section('title', 'Login')
-@section('lead', 'Small login form for checking that GET /login renders and POST /login receives form data.')
+@section('lead', 'Step back into your courses, mentoring sessions, and learning workspace.')
 
 @section('content')
     <div class="grid">
         <section class="card">
-            <h2>Login form</h2>
+            <h2>Welcome back</h2>
             <form class="stack" method="POST" action="{{ route('login.attempt') }}">
                 @csrf
                 <div class="field">
@@ -25,16 +25,16 @@
                 </label>
 
                 <div class="actions">
-                    <button type="submit">Test POST /login</button>
+                    <button type="submit">Sign in</button>
                     <a class="button secondary" href="{{ route('register') }}">Go to register</a>
                 </div>
             </form>
         </section>
 
         <section class="card">
-            <h2>What this page proves</h2>
-            <p>The controller can now return `auth.login` without a missing-view error.</p>
-            <p class="meta">If the submit fails, that means the controller logic is the next thing to fix.</p>
+            <h2>Continue learning</h2>
+            <p>Pick up where you left off with saved enrollments, profile tools, and the latest published courses.</p>
+            <p class="meta">New here? Create an account to start building your LearnFlow workspace.</p>
         </section>
     </div>
 @endsection

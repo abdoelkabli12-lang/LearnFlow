@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Register')
-@section('lead', 'Minimal registration page for testing GET /register and sending sample data to POST /register.')
+@section('lead', 'Create your learner profile and start shaping a focused course catalog around your goals.')
 
 @section('content')
     <div class="grid">
@@ -35,15 +35,15 @@
                 </div>
 
                 <div class="actions">
-                    <button type="submit">Test POST /register</button>
+                    <button type="submit">Create account</button>
                     <a class="button secondary" href="{{ route('login') }}">Back to login</a>
                 </div>
             </form>
         </section>
 
         <section class="card">
-            <h2>What this page proves</h2>
-            <p>The controller can now return `auth.register` and accept a realistic registration payload.</p>
+            <h2>Your learning home</h2>
+            <p>Use one profile for course discovery, enrollment history, progress, and account settings.</p>
         </section>
     </div>
 @endsection

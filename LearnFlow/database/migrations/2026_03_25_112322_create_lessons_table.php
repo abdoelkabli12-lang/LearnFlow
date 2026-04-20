@@ -15,7 +15,7 @@ return new class extends Migration
     $table->id();
     $table->string('title');
     $table->enum('type', ['video', 'document', 'text']);
-    $table->string('content'); // file path or URL
+    $table->text('content'); // file path or URL
     $table->integer('order_number');
     $table->integer('duration')->nullable(); // in minutes
     $table->boolean('is_free')->default(false);

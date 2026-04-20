@@ -1,9 +1,22 @@
 @extends('layouts.test-page')
 
 @section('title', $course->title)
-@section('lead', 'Course detail page for testing public viewing, host previews, and module rendering.')
+@section('lead', 'Review the curriculum, modules, instructor details, and learner feedback before you enroll.')
 
 @section('content')
+    @php
+        $currentEnrollment = auth()->check()
+            ? auth()->user()->enrollments()
+                ->where('course_id', $course->id)
+                ->where('status', 'accepted')
+                ->latest()
+                ->first()
+            : null;
+        $myReview = auth()->check()
+            ? $course->reviews->firstWhere('user_id', auth()->id())
+            : null;
+    @endphp
+
     <div class="grid">
         <section class="card">
             <div class="split">
@@ -38,7 +51,21 @@
                             <button type="submit">{{ $course->is_published ? 'Unpublish' : 'Publish' }}</button>
                         </form>
                     </div>
+                @elseif ($currentEnrollment)
+                    <div class="actions">
+                        <a class="button" href="{{ route('enrollments.show', $currentEnrollment) }}">Continue learning</a>
+                        <a class="button secondary" href="{{ route('enrollments.index') }}">My enrollments</a>
+                    </div>
+                @else
+                    <div class="actions">
+                        <a class="button" href="{{ route('payment.show', $course) }}">Enroll in this course</a>
+                    </div>
                 @endif
+            @else
+                <div class="actions">
+                    <a class="button" href="{{ route('login') }}">Log in to enroll</a>
+                    <a class="button secondary" href="{{ route('register') }}">Create an account</a>
+                </div>
             @endauth
         </section>
 
@@ -73,6 +100,96 @@
             @else
                 <p style="margin-top: 1rem;">This course has no modules yet.</p>
             @endif
+        </section>
+
+        <section class="card">
+            <h2>Reviews</h2>
+            <p class="meta">
+                {{ $course->reviews->count() }} review(s) submitted for this course.
+            </p>
+
+            @if ($errors->has('review'))
+                <p style="margin-top: 1rem; color: #b91c1c;">{{ $errors->first('review') }}</p>
+            @endif
+
+            @auth
+                @if ($currentEnrollment && ! $myReview && auth()->id() !== $course->user_id)
+                    <form class="stack" method="POST" action="{{ route('reviews.store', $course) }}" style="margin-top: 1rem;">
+                        @csrf
+
+                        <div class="field">
+                            <label for="review-rating">Rating</label>
+                            <input id="review-rating" type="number" name="rating" min="1" max="5" value="{{ old('rating') }}" required>
+                            @error('rating')
+                                <p style="margin-top: 0.35rem; color: #b91c1c;">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="field">
+                            <label for="review-comment">Comment</label>
+                            <textarea id="review-comment" name="comment" rows="4" required>{{ old('comment') }}</textarea>
+                            @error('comment')
+                                <p style="margin-top: 0.35rem; color: #b91c1c;">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit">Post review</button>
+                        </div>
+                    </form>
+                @elseif ($myReview)
+                    <form class="stack" method="POST" action="{{ route('reviews.update', $myReview) }}" style="margin-top: 1rem;">
+                        @csrf
+                        @method('PATCH')
+
+                        <div class="field">
+                            <label for="edit-review-rating">Your rating</label>
+                            <input id="edit-review-rating" type="number" name="rating" min="1" max="5" value="{{ old('rating', $myReview->rating) }}" required>
+                            @error('rating')
+                                <p style="margin-top: 0.35rem; color: #b91c1c;">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="field">
+                            <label for="edit-review-comment">Your comment</label>
+                            <textarea id="edit-review-comment" name="comment" rows="4" required>{{ old('comment', $myReview->comment) }}</textarea>
+                            @error('comment')
+                                <p style="margin-top: 0.35rem; color: #b91c1c;">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit">Update review</button>
+                        </div>
+                    </form>
+
+                    <form method="POST" action="{{ route('reviews.destroy', $myReview) }}" style="margin-top: 0.75rem;">
+                        @csrf
+                        @method('DELETE')
+                        <button class="danger" type="submit">Delete review</button>
+                    </form>
+                @elseif (auth()->id() === $course->user_id)
+                    <p style="margin-top: 1rem;">You cannot review your own course.</p>
+                @else
+                    <p style="margin-top: 1rem;">Enroll in this course to leave a review.</p>
+                @endif
+            @else
+                <p style="margin-top: 1rem;">Log in and enroll to leave a review.</p>
+            @endauth
+
+            <div class="stack" style="margin-top: 1rem;">
+                @forelse ($course->reviews as $review)
+                    <article class="card" style="padding: 1rem;">
+                        <div class="split">
+                            <strong>{{ $review->user->name }}</strong>
+                            <span class="pill">{{ $review->rating }}/5</span>
+                        </div>
+                        <p style="margin-top: 0.75rem;">{{ $review->comment }}</p>
+                    </article>
+                @empty
+                    <p style="margin-top: 1rem;">No reviews yet.</p>
+                @endforelse
+            </div>
         </section>
     </div>
 @endsection

@@ -1,7 +1,7 @@
 @extends('layouts.test-page')
 
 @section('title', 'Courses')
-@section('lead', 'Published course catalog with simple filters so you can test the public course browsing flow.')
+@section('lead', 'Browse the published LearnFlow catalog and find the next skill worth mastering.')
 
 @section('content')
     <div class="grid">

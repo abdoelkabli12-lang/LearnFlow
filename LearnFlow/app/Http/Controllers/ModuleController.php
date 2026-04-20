@@ -13,9 +13,7 @@ class ModuleController extends Controller
 {
     private function canManageCourse(Course $course): bool
     {
-        $user = Auth::user();
-
-        return (bool) $user && ($user->role === 'admin' || $course->isOwnedBy($user));
+        return (bool) Auth::user()?->can('update', $course);
     }
 
     private function ensureModuleBelongsToCourse(Module $module, Course $course): void
@@ -79,6 +77,10 @@ class ModuleController extends Controller
         $course->modules()
             ->orderBy('order_number')
             ->get()
+         
+         
+         
+         
             ->each(function (Module $courseModule, int $index): void {
                 $courseModule->update(['order_number' => $index + 1]);
             });

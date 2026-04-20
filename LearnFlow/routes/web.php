@@ -8,8 +8,18 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReviewController;
+use App\Models\Course;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', function () {
+    $courses = Course::published()
+        ->with(['category', 'user', 'reviews'])
+        ->oldest()
+        ->take(3)
+        ->get();
+
+    return view('welcome', compact('courses'));
+})->name('home');
 
 Route::get('/login', [UserController::class, 'showLogin'])->name('login');
 Route::post('/login', [UserController::class, 'login'])->name('login.attempt');
@@ -87,16 +97,7 @@ Route::middleware(['auth', 'role:host,admin'])
         Route::delete('/{module}', [ModuleController::class, 'destroy'])->name('destroy');
     });
 
-
 Route::middleware(['auth', 'role:host'])->prefix('host')->name('host.')->group(function () {
-
-
-    // Modules
-    Route::post('/courses/{course}/modules', [ModuleController::class, 'store'])->name('modules.store');
-    Route::put('/modules/{module}', [ModuleController::class, 'update'])->name('modules.update');
-    Route::delete('/modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
-    Route::post('/courses/{course}/modules/reorder', [ModuleController::class, 'reorder'])->name('modules.reorder');
-
     // Lessons
     Route::post('/modules/{module}/lessons', [LessonController::class, 'store'])->name('lessons.store');
     Route::put('/lessons/{lesson}', [LessonController::class, 'update'])->name('lessons.update');
@@ -108,13 +109,22 @@ Route::middleware(['auth', 'role:host'])->prefix('host')->name('host.')->group(f
 Route::middleware('auth')->get('/lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
 
 
-Route::middleware(['auth', 'role:abonne'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::get('/enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollments.show');
+    Route::patch('/enrollments/{enrollment}', [EnrollmentController::class, 'update'])->name('enrollments.update');
     Route::patch('/enrollments/{enrollment}/cancel', [EnrollmentController::class, 'cancel'])->name('enrollments.cancel');
+    Route::delete('/enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/courses/{course}/checkout', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/courses/{course}/checkout', [PaymentController::class, 'store'])->name('payment.store');
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::post('/courses/{course}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::patch('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
