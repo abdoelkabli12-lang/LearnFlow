@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\PaymentController;
@@ -12,11 +13,13 @@ use App\Http\Controllers\ReviewController;
 use App\Models\Course;
 
 Route::get('/', function () {
-    $courses = Course::published()
-        ->with(['category', 'user', 'reviews'])
-        ->oldest()
-        ->take(3)
-        ->get();
+    $courses = Schema::hasTable('courses')
+        ? Course::published()
+            ->with(['category', 'user', 'reviews'])
+            ->oldest()
+            ->take(3)
+            ->get()
+        : collect();
 
     return view('welcome', compact('courses'));
 })->name('home');
@@ -72,23 +75,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::prefix('courses')->name('courses.')->group(function () {
     Route::get('/', [CourseController::class, 'index'])->name('index');
-    Route::get('/{course}', [CourseController::class, 'show'])->name('show');
+    Route::get('/{course}', [CourseController::class, 'show'])->whereNumber('course')->name('show');
 });
 
 Route::middleware(['auth', 'role:host,admin'])->prefix('host/courses')->name('host.courses.')->group(function () {
     Route::get('/', [CourseController::class, 'hostIndex'])->name('index');
     Route::get('/create', [CourseController::class, 'create'])->name('create');
     Route::post('/', [CourseController::class, 'store'])->name('store');
-    Route::get('/{course}', [CourseController::class, 'show'])->name('show');
-    Route::get('/{course}/edit', [CourseController::class, 'edit'])->name('edit');
-    Route::patch('/{course}', [CourseController::class, 'update'])->name('update');
-    Route::delete('/{course}', [CourseController::class, 'destroy'])->name('destroy');
-    Route::patch('/{course}/publish', [CourseController::class, 'togglePublish'])->name('publish');
+    Route::get('/{course}', [CourseController::class, 'show'])->whereNumber('course')->name('show');
+    Route::get('/{course}/edit', [CourseController::class, 'edit'])->whereNumber('course')->name('edit');
+    Route::patch('/{course}', [CourseController::class, 'update'])->whereNumber('course')->name('update');
+    Route::delete('/{course}', [CourseController::class, 'destroy'])->whereNumber('course')->name('destroy');
+    Route::patch('/{course}/publish', [CourseController::class, 'togglePublish'])->whereNumber('course')->name('publish');
 });
 
 Route::middleware(['auth', 'role:host,admin'])
     ->prefix('host/courses/{course}/modules')
     ->name('host.courses.modules.')
+    ->whereNumber('course')
     ->scopeBindings()
     ->group(function () {
         Route::post('/', [ModuleController::class, 'store'])->name('store');
@@ -118,13 +122,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/courses/{course}/checkout', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/courses/{course}/checkout', [PaymentController::class, 'store'])->name('payment.store');
+    Route::get('/courses/{course}/checkout', [PaymentController::class, 'show'])->whereNumber('course')->name('payment.show');
+    Route::post('/courses/{course}/checkout', [PaymentController::class, 'store'])->whereNumber('course')->name('payment.store');
 });
 
 
 Route::middleware('auth')->group(function () {
-    Route::post('/courses/{course}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/courses/{course}/reviews', [ReviewController::class, 'store'])->whereNumber('course')->name('reviews.store');
     Route::patch('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });

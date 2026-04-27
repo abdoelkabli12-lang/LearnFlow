@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
@@ -30,24 +31,109 @@ class CourseController extends Controller
 
     public function index(Request $request)
     {
-        $query = Course::published()->with(['category', 'user', 'reviews']);
+        $selectedCategories = collect($request->input('category', $request->input('categories', [])))
+            ->flatten()
+            ->filter()
+            ->map(fn ($category) => (int) $category)
+            ->unique()
+            ->values();
 
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+        $selectedLevel = $request->string('level')->toString();
+        $selectedSort = $request->string('sort')->toString() ?: 'most_relevant';
+        $selectedRating = (int) $request->input('rating', 0);
+        $search = trim($request->string('search')->toString());
+
+        $query = Course::published()
+            ->with(['category', 'user'])
+            ->withCount([
+                'reviews',
+                'enrollments as accepted_enrollments_count' => fn ($enrollments) => $enrollments->where('status', 'accepted'),
+            ])
+            ->withAvg('reviews', 'rating');
+
+        $applyRatingOrder = function ($builder) {
+            $driver = $builder->getConnection()->getDriverName();
+
+            if ($driver === 'pgsql') {
+                $builder->orderByRaw('reviews_avg_rating desc nulls last');
+
+                return;
+            }
+
+            $builder->orderByDesc('reviews_avg_rating');
+        };
+
+        if ($selectedCategories->isNotEmpty()) {
+            $query->whereIn('category_id', $selectedCategories->all());
         }
 
-        if ($request->filled('level')) {
-            $query->byLevel($request->level);
+        if ($selectedLevel !== '') {
+            $query->byLevel($selectedLevel);
         }
 
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search) {
+                $builder->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', '%' . $search . '%'))
+                    ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery->where('name', 'like', '%' . $search . '%'));
+            });
         }
 
-        $courses    = $query->latest()->paginate(12)->withQueryString();
-        $categories = Category::withCount('courses')->get();
+        if ($selectedRating > 0) {
+            $query->whereRaw(
+                '(select coalesce(avg(reviews.rating), 0) from reviews where reviews.course_id = courses.id) >= ?',
+                [$selectedRating]
+            );
+        }
 
-        return view('courses.index', compact('courses', 'categories'));
+        match ($selectedSort) {
+            'newest' => $query->latest(),
+            'price_low' => $query->orderBy('price'),
+            'price_high' => $query->orderByDesc('price'),
+            'highest_rated' => $query
+                ->tap($applyRatingOrder)
+                ->orderByDesc('reviews_count')
+                ->latest(),
+            'popular' => $query
+                ->orderByDesc('accepted_enrollments_count')
+                ->orderByDesc('reviews_count')
+                ->latest(),
+            default => $query
+                ->tap($applyRatingOrder)
+                ->orderByDesc('accepted_enrollments_count')
+                ->orderByDesc('reviews_count')
+                ->latest(),
+        };
+
+        $courses = $query->paginate(12)->withQueryString();
+        $categories = Category::withCount([
+            'courses as courses_count' => fn ($coursesQuery) => $coursesQuery->published(),
+        ])->orderBy('name')->get();
+
+        $selectedCategoryIds = $selectedCategories->all();
+        $levels = ['Beginner', 'Intermediate', 'Advanced', 'All'];
+        $sortOptions = [
+            'most_relevant' => 'Most Relevant',
+            'newest' => 'Newest',
+            'highest_rated' => 'Highest Rated',
+            'popular' => 'Most Popular',
+            'price_low' => 'Price: Low to High',
+            'price_high' => 'Price: High to Low',
+        ];
+
+        return view('courses.index', [
+            'courses' => $courses,
+            'categories' => $categories,
+            'levels' => $levels,
+            'sortOptions' => $sortOptions,
+            'selectedCategoryIds' => $selectedCategoryIds,
+            'selectedLevel' => $selectedLevel,
+            'selectedSort' => $selectedSort,
+            'selectedRating' => $selectedRating,
+            'search' => $search,
+            'resultLabel' => Str::of(number_format($courses->total()))->append(' premium courses curated for your career growth.'),
+        ]);
     }
 
     public function show(Course $course)
