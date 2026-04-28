@@ -54,18 +54,21 @@ class PaymentController extends Controller
         if ($course->isOwnedBy(Auth::user())) {
             return back()->withErrors(['error' => 'You cannot enroll in your own course.']);
         }
-
+            
+        
+        
         $enrollment = DB::transaction(function () use ($course) {
+            $user = Auth::user();
             $enrollment = Enrollment::create([
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'course_id' => $course->id,
                 'enrolled_at' => now(),
                 'status' => 'accepted',
                 'progress' => 0,
-            ]);
-
+                ]);
+                
             Payment::create([
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'course_id' => $course->id,
                 'enrollment_id' => $enrollment->id,
                 'amount' => $course->price,
@@ -73,11 +76,17 @@ class PaymentController extends Controller
                 'payment_date' => now(),
             ]);
 
+            if ($user->role === 'visitor') {
+                $user->update ([
+                    'role' => 'student',
+                ]);
+            }
+
             return $enrollment;
         });
 
         return redirect()
-            ->route('enrollments.show', $enrollment)
+            ->route('dashboard')
             ->with('success', 'You have successfully enrolled in the course.');
     }
 
